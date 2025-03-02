@@ -114,11 +114,11 @@ public class Main {
 
         for (String token : tokens) {
 
-            if (token.matches("\\d+")) { (this is for if it’s a number)
+            if (token.matches("\\d+")) { //this is for if it’s a number
 
                 values.push(parseNumber(token, base));
 
-            } else { (this is if it’s an operator)
+            } else { //this is if it’s an operator
 
                 while (!operators.isEmpty() && precedence(operators.peek()) >= precedence(token.charAt(0))) {
 
