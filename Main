@@ -27,7 +27,7 @@ public class Main {
         int minBase = findMinBase(input);
 
 
-        for (int base = minBase; base <= 36; base++) { (do this so that it goes to 36)
+        for (int base = minBase; base <= 36; base++) { //do this so that it goes to 36
 
             if (evaluateExpression(sides[0], base) == evaluateExpression(sides[1], base)) {
 
@@ -67,7 +67,7 @@ public class Main {
 
         }
 
-        return Math.max(maxDigit, 2); (minimum base has to be 2)
+        return Math.max(maxDigit, 2); //minimum base has to be 2
 
     }
 
