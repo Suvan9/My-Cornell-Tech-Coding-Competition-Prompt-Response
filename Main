@@ -1,0 +1,209 @@
+
+import java.util.*;
+
+import java.util.regex.*;
+
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Enter a mathematical expression");
+
+        String input = scanner.nextLine().replaceAll("\\s", ""); //i'm doing this to get rid of spaces
+
+
+        String[] sides = input.split("=");         if (sides.length != 2) {
+
+            System.out.println("Invalid expression format.");
+
+            return;
+
+        }
+
+
+        int minBase = findMinBase(input);
+
+
+        for (int base = minBase; base <= 36; base++) { (do this so that it goes to 36)
+
+            if (evaluateExpression(sides[0], base) == evaluateExpression(sides[1], base)) {
+
+                System.out.println("Valid base: " + base);
+
+                return;
+
+            }
+
+        }
+
+
+        System.out.println("No valid base found.");
+
+        scanner.close();
+
+    }
+
+
+//this will look for the minimum base
+
+    private static int findMinBase(String expr) {
+
+        int maxDigit = 1;
+
+        for (char c : expr.toCharArray()) {
+
+            if (Character.isDigit(c)) {
+
+                maxDigit = Math.max(maxDigit, c - '0' + 1);
+
+            } else if (Character.isLetter(c)) { //this is to deal with letters, so like (A=10, B=11, Z=35)
+
+                maxDigit = Math.max(maxDigit, c - 'A' + 11);
+
+            }
+
+        }
+
+        return Math.max(maxDigit, 2); (minimum base has to be 2)
+
+    }
+
+
+  //i need to use tokenize so that it properly evaluates the numbers
+
+    private static int evaluateExpression(String expr, int base) {
+
+        List<String> tokens = tokenize(expr);
+
+        return evaluateTokens(tokens, base);
+
+    }
+
+
+   
+
+    private static List<String> tokenize(String expr) {
+
+        List<String> tokens = new ArrayList<>();
+
+        Matcher matcher = Pattern.compile("\\d+|[+\\-*/]").matcher(expr);
+
+
+        while (matcher.find()) {
+
+            tokens.add(matcher.group());
+
+        }
+
+        return tokens;
+
+    }
+
+
+  //i then need to evaluate the tokenized expression
+
+    private static int evaluateTokens(List<String> tokens, int base) {
+
+        Stack<Integer> values = new Stack<>();
+
+        Stack<Character> operators = new Stack<>();
+
+
+        for (String token : tokens) {
+
+            if (token.matches("\\d+")) { (this is for if it’s a number)
+
+                values.push(parseNumber(token, base));
+
+            } else { (this is if it’s an operator)
+
+                while (!operators.isEmpty() && precedence(operators.peek()) >= precedence(token.charAt(0))) {
+
+                    applyOperator(values, operators.pop());
+
+                }
+
+                operators.push(token.charAt(0));
+
+            }
+
+        }
+
+
+        while (!operators.isEmpty()) {
+
+            applyOperator(values, operators.pop());
+
+        }
+
+
+        return values.isEmpty() ? 0 : values.pop();
+
+    }
+
+
+  //converts string to integer
+
+    private static int parseNumber(String num, int base) {
+
+        try {
+
+            return Integer.parseInt(num, base);
+
+        } catch (NumberFormatException e) {
+
+            return Integer.MIN_VALUE; // Return invalid number flag
+
+        }
+
+    }
+
+
+  //this is to put an operator for the first two in the stack
+
+    private static void applyOperator(Stack<Integer> values, char operator) {
+
+        if (values.size() < 2) return;
+
+
+        int b = values.pop();
+
+        int a = values.pop();
+
+
+        switch (operator) {
+
+            case '+': values.push(a + b); break;
+
+            case '-': values.push(a - b); break;
+
+            case '*': values.push(a * b); break;
+
+            case '/': 
+
+                if (b == 0) return; //so that there is no division by 0
+
+                values.push(a / b); 
+
+                break;
+
+        }
+
+    }
+
+
+    //i need to define operator precedence
+
+
+    private static int precedence(char op) {
+
+        return (op == '+' || op == '-') ? 1 : 2;
+
+    }
+
+}
+
+
